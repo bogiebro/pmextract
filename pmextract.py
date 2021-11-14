@@ -1,6 +1,9 @@
 import ctypes
 import inspect
 
+def ipython_context(filename):
+    return filename.startswith("/tmp/ipykernel") or filename.startswith('<ipython-input')
+
 def extract(source=None, err=True):
     if source is None:
         frames = inspect.stack()
@@ -15,7 +18,7 @@ def extract(source=None, err=True):
     else:
         raise ValueError(f'Don\'t support source {source}')
 
-    ipython = [f for f in inspect.stack() if f.filename.startswith('<ipython-input')][-1].frame
+    ipython = [f for f in inspect.stack() if ipython_context(f.filename)][-1].frame
 
     ipython.f_locals.update({k: v for k, v in gs.items() if k[:2] != '__'})
     ipython.f_locals.update({k: v for k, v in ls.items() if k[:2] != '__'})
